@@ -22,8 +22,112 @@ jobs:
           echo "installing to /bin (default location if not set)"
           echo "after installation, scripts will be called directly (not with ./filename but filename)"
           sudo sh install.sh
+          git config --global user.email "you@example.com"
+          git config --global user.name "Your Name"
 
-          echo "TODO"
+
+          echo "setup case 1: create a normal worktree in neighboring directory"
+          mkdir /tmp/mytest
+          mkdir /tmp/mytest/repo1
+          cd /tmp/mytest/repo1
+          git init
+          echo "file1" > file1
+          git add .
+          git commit -am 'initial commit'
+          git status
+
+
+          echo "test case 1"
+          cd /tmp/mytest/repo1
+          git-worktree-create -b repo1_branch1 -w 0 -v
+          cd /tmp/mytest/repo1_branch1
+          echo "`cat /tmp/mytest/repo1_branch1/.git`"
+          if test "`cat /tmp/mytest/repo1_branch1/.git`" != "gitdir: /tmp/mytest/repo1/.git/worktrees/repo1_branch1"; then
+            echo "failed asserting git file"
+            exit 201
+          fi
+          echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch1/gitdir`"
+          if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch1/gitdir`" != "/tmp/mytest/repo1_branch1/.git"; then
+            echo "failed asserting git worktrees gitdir file"
+            exit 202
+          fi
+          git status
+          git worktree list
+
+
+          echo "test case 2: force overwrite directory as worktree"
+          mkdir /tmp/mytest/repo1_branch2
+          cd /tmp/mytest/repo1_branch2
+          echo "file1" > file1
+          echo "file1 additional line" >> file1
+          echo "file2" > file2
+          cd /tmp/mytest/repo1
+          git-worktree-create -b repo1_branch2 -f -w 0 -v
+          echo "`cat /tmp/mytest/repo1_branch2/file2`"
+          if test "`cat /tmp/mytest/repo1_branch2/file2`" != "file2"; then
+            echo "failed asserting file2 file content"
+            exit 203
+          fi
+          echo "`cat /tmp/mytest/repo1_branch2/file1`"
+          if test "`cat /tmp/mytest/repo1_branch2/file1`" != "`echo -e \"file1\nfile1 additional line\"`"; then
+            echo "failed asserting file1 file content"
+            exit 204
+          fi
+          cd /tmp/mytest/repo1_branch2
+          pwd
+          git status
+          git worktree list
+          echo "`cat /tmp/mytest/repo1_branch2/.git`"
+          if test "`cat /tmp/mytest/repo1_branch2/.git`" != "gitdir: /tmp/mytest/repo1/.git/worktrees/repo1_branch2"; then
+            echo "failed asserting git file"
+            exit 205
+          fi
+          echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch2/gitdir`"
+          if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch2/gitdir`" != "/tmp/mytest/repo1_branch2/.git"; then
+            echo "failed asserting git worktrees gitdir file"
+            exit 206
+          fi
+
+
+          echo "setup case 3: add some linked files"
+          cd /tmp/mytest/repo1
+          git-worktree-create -b repo1_branch3 -w 0 -v -l file1
+          cd /tmp/mytest/repo1_branch3
+          echo "`cat /tmp/mytest/repo1_branch3/.git`"
+          if test "`cat /tmp/mytest/repo1_branch3/.git`" != "gitdir: /tmp/mytest/repo1/.git/worktrees/repo1_branch3"; then
+            echo "failed asserting git file"
+            exit 207
+          fi
+          echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch3/gitdir`"
+          if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch3/gitdir`" != "/tmp/mytest/repo1_branch3/.git"; then
+            echo "failed asserting git worktrees gitdir file"
+            exit 208
+          fi
+          echo "`readlink -f /tmp/mytest/repo1_branch3/file1`"
+          if test "`readlink -f /tmp/mytest/repo1_branch3/file1`" != "/tmp/mytest/repo1/file1"; then
+            echo "failed asserting softlinked file"
+            exit 209
+          fi
+          git status
+          git worktree list
+
+          echo "setup case 4: make worktree with relative path"
+          cd /tmp/mytest/repo1
+          git-worktree-create -b repo1_branch4 -w 0 -v -a .
+          cd /tmp/mytest/repo1_branch4
+          echo "`cat /tmp/mytest/repo1_branch4/.git`"
+          if test "`cat /tmp/mytest/repo1_branch4/.git`" != "gitdir: ../repo1/.git/worktrees/repo1_branch4"; then
+            echo "failed asserting git file"
+            exit 210
+          fi
+          echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4/gitdir`"
+          if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4/gitdir`" != "../repo1_branch4/.git"; then
+            echo "failed asserting git worktrees gitdir file"
+            exit 211
+          fi
+          git status
+          git worktree list
+
 
           cd "$initial_directory_path"
           echo "uninstalling from /bin (default location if not set)"

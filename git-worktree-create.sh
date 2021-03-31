@@ -107,31 +107,31 @@ verbose_output "  \$ cd \"$repository_target\""
 cd "$repository_target"
 
 verbose_output "create branch if not exist (please ignore error)"
-verbose_output "  \$ git branch $branch_target"
-git branch $branch_target
+verbose_output "  \$ git branch $branch_target || true"
+git branch $branch_target || true
 
 if test $force_flag -eq 1; then
   verbose_output "mode: force replace"
   
   verbose_output "rename target directory"
-  verbose_output "  \$ mv \"$directory_target\" \"tmp-$directory_target\""
-  mv "$directory_target" "tmp-$directory_target"
+  verbose_output "  \$ mv \"$directory_target\" \"$directory_target-tmp\""
+  mv "$directory_target" "$directory_target-tmp"
 
   verbose_output "create worktree"
   verbose_output "  \$ git worktree add --no-checkout \"$directory_target\" $branch_target"
   git worktree add --no-checkout "$directory_target" $branch_target
 
   verbose_output "move .git file from newly created worktree to target directory"
-  verbose_output "  \$ mv \"$branch_target/.git\" \"tmp-$directory_target/.git\""
-  mv "$branch_target/.git" "tmp-$directory_target/.git"
+  verbose_output "  \$ mv \"$directory_target/.git\" \"$directory_target-tmp/.git\""
+  mv "$directory_target/.git" "$directory_target-tmp/.git"
 
   verbose_output "delete generated worktree directory (should be empty)"
   verbose_output "  \$ rmdir \"$directory_target\""
   rmdir "$directory_target"
 
   verbose_output "rename target directory back"
-  verbose_output "  \$ mv \"tmp-$directory_target\" \"$directory_target\""
-  mv "tmp-$directory_target" "$directory_target"
+  verbose_output "  \$ mv \"$directory_target-tmp\" \"$directory_target\""
+  mv "$directory_target-tmp" "$directory_target"
 
   echo ">>> operation finished, you should go to newly created worktree and check if there are unstaged changes"
   echo ">>> delete worktree with 'git worktree remove --force $branch_target'"
@@ -143,16 +143,18 @@ else
   git worktree add "$directory_target" $branch_target
 fi
 
+verbose_output "deleting linked files"
 for val in "${linked_files[@]}"; do
-  verbose_output "deleting linked files"
   verbose_output "  \$ rm -rf \"$directory_target/$val\""
   rm -rf "$directory_target/$val"
 done
 
+verbose_output "linking files"
 for val in "${linked_files[@]}"; do
-  verbose_output "linking files"
-  verbose_output "  \$ ln -s \"$val\" \"$directory_target/$val\""
-  ln -s "$val" "$directory_target/$val"
+  verbose_output "  getting relative path"
+  path_relative=`realpath --relative-to="$directory_target" "$val"`
+  verbose_output "  \$ ln -s \"$path_relative\" \"$directory_target/$val\""
+  ln -s "$path_relative" "$directory_target/$val"
 done
 
 if test "$anchor_relative" != ""; then
@@ -202,4 +204,4 @@ echo ">>> git worktree remove --force $directory_target "
 echo ">>>   flag --force will delete your worktree even if there are untracked/modified files"
 echo ">>> "
 echo ">>> to move worktree, use 'git worktree move <worktree> <new-path>', ex: "
-echo ">>> git worktree move $directory_target new-$directory_target "
+echo ">>> git worktree move $directory_target $directory_target-new "
