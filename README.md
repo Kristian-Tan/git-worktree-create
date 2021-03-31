@@ -35,6 +35,7 @@
 ## Usage
 
 - Execute the script with `-b branch_target` option in your repository (or supply the repository directory path in -r options)
+- This script have some more 'frills' (very specific/not-generally-used features that can be turned on with flags), example: it's `[-l linked_files] [-a anchor_relative] [-w wait_seconds]` flags
 - usage: `git-worktree-create -b branch_target [-d directory_target] [-r repository_target] [-f] [-l linked_files] [-a anchor_relative] [-w wait_seconds] [-v]`
 - Options:
   - `-b branch_target` = name of target branch (if not exist it will be created)
@@ -53,6 +54,7 @@
   - (-l) in the directory we have 'vendor' and 'node_modules' that we want to softlink in order to save disk space,
   - (-w) wait for 0 seconds (do it immediately)
   - (-v) verbose output on
+
 
 ## Installation
 

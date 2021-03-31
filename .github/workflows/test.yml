@@ -1,0 +1,31 @@
+# This is a basic workflow to help you get started with Actions
+
+name: test
+
+on:
+  push:
+    branches: [ master, development, dev* ]
+  pull_request:
+    branches: [ master, development, dev* ]
+
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run a multi-line script
+        run: |
+          initial_directory_path="`pwd`"
+          cd "$initial_directory_path"
+          echo "installing to /bin (default location if not set)"
+          echo "after installation, scripts will be called directly (not with ./filename but filename)"
+          sudo sh install.sh
+
+          echo "TODO"
+
+          cd "$initial_directory_path"
+          echo "uninstalling from /bin (default location if not set)"
+          sudo sh uninstall.sh
+
