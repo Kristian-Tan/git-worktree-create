@@ -1,4 +1,4 @@
-# git-worktree-relative
+# git-worktree-create
 
 
 ## Background
@@ -58,15 +58,31 @@
 
 #### Automatic Installation
 
-TODO
+- copy paste below command into your terminal:
+```bash
+git clone https://github.com/Kristian-Tan/git-worktree-create.git
+cd git-worktree-create
+sudo bash install.sh
+```
+- or this one-line: ```git clone https://github.com/Kristian-Tan/git-worktree-create.git ; cd git-worktree-create ; sudo bash install.sh```
 
 #### Manual Installation
 
-TODO
+- installation for all users:
+  - copy `git-worktree-create.sh` to `/usr/bin` or `/bin` (you can also remove the extension)
+  - give other user permission to execute it
+  - example:
+  ```bash
+    cp git-worktree-create.sh /usr/bin/git-worktree-create
+    chown root:root /usr/bin/git-worktree-create
+    chmod 0755 /usr/bin/git-worktree-create
+  ```
+- installation for one user:
+  - copy it to any directory that is added to your PATH variable
 
 #### Uninstallation
 
-TODO
+- just remove copied files (or just use uninstall.sh script: ```git clone https://github.com/Kristian-Tan/git-worktree-create.git ; sudo bash git-worktree-create/uninstall.sh```)
 
 ## Contributing
 
