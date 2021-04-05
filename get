@@ -1,0 +1,4 @@
+git clone https://github.com/Kristian-Tan/git-worktree-create.git
+cd git-worktree-create
+sudo bash install.sh
+rm -rf ../git-worktree-create
