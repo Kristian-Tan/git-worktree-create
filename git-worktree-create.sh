@@ -8,22 +8,21 @@ directory_target=""
 repository_target=`pwd`
 force_flag=0
 linked_files=() # array, see https://stackoverflow.com/a/20761893/3706717
-anchor_relative=""
+#anchor_relative=""
 wait_seconds=5
 verbose=0
 
 # read arguments from getopts https://wiki.bash-hackers.org/howto/getopts_tutorial https://stackoverflow.com/a/14203146/3706717
-while getopts "hb:d:r:fl:a:w:v" opt; do
+while getopts "hb:d:r:fl:w:v" opt; do
     case "$opt" in
     h)
         cat << EOF
-usage: -b branch_target [-d directory_target] [-r repository_target] [-f] [-l linked_files] [-a anchor_relative] [-w wait_seconds] [-v]
+usage: -b branch_target [-d directory_target] [-r repository_target] [-f] [-l linked_files] [-w wait_seconds] [-v]
   -b branch_target = name of target branch (if not exist it will be created)
   -d directory_target = name of target directory, default to '../{branch_target}'
   -r repository_target = path to repository, default to current directory
   -f = force_flag, must be set to replace existing directory with a branch. in that case a new worktree will be created with content of the target directory
   -l linked_files = multiple files/directories to be softlinked into new worktree (usually for large directory that will never change like './vendor' or './node_modules', softlinked in order to save disk space)
-  -a anchor_relative = make the created worktree linked by relative path instead of absolute one, option anchor_relative must be set to a directory name to be used in anchoring them (if not set, default absolute path worktree will be used)
   -w wait_seconds = waiting for ... seconds before executing (default to 5), if you're sure about the operation then just set it to 0
   -v = verbose
 example 1: -b branch_kristian -d /var/www/project1_kristian -r /var/www/project1 -f -l vendor -l node_modules -w 0 -v
@@ -35,6 +34,7 @@ example 1: -b branch_kristian -d /var/www/project1_kristian -r /var/www/project1
   (-w) wait for 0 seconds (do it immediately)
   (-v) verbose output on
 EOF
+#-a anchor_relative = make the created worktree linked by relative path instead of absolute one, option anchor_relative must be set to a directory name to be used in anchoring them (if not set, default absolute path worktree will be used)
         exit 0
         ;;
     b)  branch_target=$OPTARG
@@ -47,8 +47,8 @@ EOF
         ;;
     l)  linked_files+=("$OPTARG")
         ;;
-    a)  anchor_relative=$OPTARG
-        ;;
+    #a)  anchor_relative=$OPTARG
+    #    ;;
     w)  wait_seconds=$OPTARG
         ;;
     v)  verbose=1
@@ -65,8 +65,7 @@ done
 verbose_output()
 {
   if test $verbose -eq 1; then
-    #{ printf '>>> %s ' "$@"; echo; } 1>&2
-    echo $1
+    { printf '>>> %s ' "$@"; echo; } 1>&2
   fi
 }
 
@@ -86,16 +85,16 @@ if test ! -d $directory_target -a $force_flag -eq 1; then
   echo ">>> directory $directory_target does not exist! please do not use force_flag"
   exit 3
 fi
-if test "$anchor_relative" = "."; then
-  verbose_output "testing if \"`readlink -f $anchor_relative`\" is equal to \"`readlink -f $repository_target`\""
-  if test "`readlink -f $anchor_relative`" == "`readlink -f $repository_target`"; then
-    verbose_output "it's equal, so anchor is set to parent directory"
-    anchor_relative="$repository_target/.."
-  else
-    verbose_output "it's not equal, so anchor is set to current directory"
-    anchor_relative=`pwd`
-  fi
-fi
+# if test "$anchor_relative" = "."; then
+#   verbose_output "testing if \"`readlink -f $anchor_relative`\" is equal to \"`readlink -f $repository_target`\""
+#   if test "`readlink -f $anchor_relative`" == "`readlink -f $repository_target`"; then
+#     verbose_output "it's equal, so anchor is set to parent directory"
+#     anchor_relative="$repository_target/.."
+#   else
+#     verbose_output "it's not equal, so anchor is set to current directory"
+#     anchor_relative=`pwd`
+#   fi
+# fi
 
 # show to user
 verbose_output "branch_target: '$branch_target'"
@@ -103,7 +102,7 @@ verbose_output "directory_target: '$directory_target'"
 verbose_output "repository_target: '$repository_target'"
 verbose_output "force_flag: '$force_flag'"
 verbose_output "linked_files: '${linked_files[@]}'"
-verbose_output "anchor_relative: '$anchor_relative'"
+#verbose_output "anchor_relative: '$anchor_relative'"
 verbose_output "wait_seconds: '$wait_seconds'"
 
 echo ">>> executing in $wait_seconds seconds... (press ctrl+c to abort)"
@@ -169,42 +168,40 @@ for val in "${linked_files[@]}"; do
   ln -s "$path_relative" "$directory_target/$val"
 done
 
-if test "$anchor_relative" != ""; then
-  
-  verbose_output "converting worktree reference to use relative path instead of absolute path"
-  
-  anchor_relative=`readlink -f $anchor_relative`
-  verbose_output "  anchor relative to: $anchor_relative"
-  
-  absolute_repository=`readlink -f $repository_target`
-  verbose_output "  repository absolute path is: $absolute_repository"
-  
-  absolute_worktree=`readlink -f $directory_target`
-  verbose_output "  worktree absolute path is: $absolute_worktree"
-  
-  temp1_worktree_to_anchor=`realpath --relative-to="$absolute_worktree" "$anchor_relative"`
-  temp1_repo_to_worktree=`realpath --relative-to="$temp1_worktree_to_anchor" "$absolute_worktree"`
-  path_repository_to_worktree="$temp1_worktree_to_anchor/$temp1_repo_to_worktree"
-  verbose_output "  relative path from repository to worktree is: $path_repository_to_worktree"
-  
-  temp2_repo_to_anchor=`realpath --relative-to="$absolute_repository" "$anchor_relative"`
-  temp2_worktree_to_repo=`realpath --relative-to="$temp2_repo_to_anchor" "$absolute_repository"`
-  path_worktree_to_repo="$temp2_repo_to_anchor/$temp2_worktree_to_repo"
-  verbose_output "  relative path from worktree to repository is: $path_worktree_to_repo"
-  
-  verbose_output "  \$ sed -i \"s+$absolute_repository+$path_worktree_to_repo+g\" \"$directory_target/.git\""
-  sed -i "s+$absolute_repository+$path_worktree_to_repo+g" "$directory_target/.git"
-
-  worktree_link_content="$(cat $directory_target/.git)"
-  worktree_link_content="${worktree_link_content/gitdir: /}" # replace "gitdir: " with ""
-  worktree_link_content=`readlink -f $worktree_link_content`
-  verbose_output "  gitdir points to: $worktree_link_content"
-
-  verbose_output "  \$ sed -i \"s+$absolute_worktree+$path_repository_to_worktree+g\" \"$worktree_link_content/gitdir\""
-  sed -i "s+$absolute_worktree+$path_repository_to_worktree+g" "$worktree_link_content/gitdir"
-
-
-fi
+# if test "$anchor_relative" != ""; then
+#
+#   verbose_output "converting worktree reference to use relative path instead of absolute path"
+#
+#   anchor_relative=`readlink -f $anchor_relative`
+#   verbose_output "  anchor relative to: $anchor_relative"
+#
+#   absolute_repository=`readlink -f $repository_target`
+#   verbose_output "  repository absolute path is: $absolute_repository"
+#
+#   absolute_worktree=`readlink -f $directory_target`
+#   verbose_output "  worktree absolute path is: $absolute_worktree"
+#
+#   temp1_worktree_to_anchor=`realpath --relative-to="$absolute_worktree" "$anchor_relative"`
+#   temp1_repo_to_worktree=`realpath --relative-to="$temp1_worktree_to_anchor" "$absolute_worktree"`
+#   path_repository_to_worktree="$temp1_worktree_to_anchor/$temp1_repo_to_worktree"
+#   verbose_output "  relative path from repository to worktree is: $path_repository_to_worktree"
+#
+#   temp2_repo_to_anchor=`realpath --relative-to="$absolute_repository" "$anchor_relative"`
+#   temp2_worktree_to_repo=`realpath --relative-to="$temp2_repo_to_anchor" "$absolute_repository"`
+#   path_worktree_to_repo="$temp2_repo_to_anchor/$temp2_worktree_to_repo"
+#   verbose_output "  relative path from worktree to repository is: $path_worktree_to_repo"
+#
+#   verbose_output "  \$ sed -i \"s+$absolute_repository+$path_worktree_to_repo+g\" \"$directory_target/.git\""
+#   sed -i "s+$absolute_repository+$path_worktree_to_repo+g" "$directory_target/.git"
+#
+#   worktree_link_content="$(cat $directory_target/.git)"
+#   worktree_link_content="${worktree_link_content/gitdir: /}" # replace "gitdir: " with ""
+#   worktree_link_content=`readlink -f $worktree_link_content`
+#   verbose_output "  gitdir points to: $worktree_link_content"
+#
+#   verbose_output "  \$ sed -i \"s+$absolute_worktree+$path_repository_to_worktree+g\" \"$worktree_link_content/gitdir\""
+#   sed -i "s+$absolute_worktree+$path_repository_to_worktree+g" "$worktree_link_content/gitdir"
+# fi
 
 
 echo ">>> done; to see documentation about git worktree, visit https://git-scm.com/docs/git-worktree"

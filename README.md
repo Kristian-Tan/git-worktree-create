@@ -35,15 +35,14 @@
 ## Usage
 
 - Execute the script with `-b branch_target` option in your repository (or supply the repository directory path in -r options)
-- This script have some more 'frills' (very specific/not-generally-used features that can be turned on with flags), example: it's `[-l linked_files] [-a anchor_relative] [-w wait_seconds]` flags
-- usage: `git-worktree-create -b branch_target [-d directory_target] [-r repository_target] [-f] [-l linked_files] [-a anchor_relative] [-w wait_seconds] [-v]`
+- This script have some more 'frills' (very specific/not-generally-used features that can be turned on with flags), example: it's `[-l linked_files] [-w wait_seconds]` flags
+- usage: `git-worktree-create -b branch_target [-d directory_target] [-r repository_target] [-f] [-l linked_files] [-w wait_seconds] [-v]`
 - Options:
   - `-b branch_target` = name of target branch (if not exist it will be created)
   - `-d directory_target` = name of target directory, default to '../{branch_target}'
   - `-r repository_target` = path to repository, default to current directory
   - `-f` = force_flag, must be set to replace existing directory with a branch. in that case a new worktree will be created with content of the target directory
   - `-l linked_files` = multiple files/directories to be softlinked into new worktree (usually for large directory that will never change like './vendor' or './node_modules', softlinked in order to save disk space)
-  - `-a anchor_relative` = make the created worktree linked by relative path instead of absolute one, option anchor_relative must be set to a directory name to be used in anchoring them (if not set, default absolute path worktree will be used)
   - `-w wait_seconds` = waiting for ... seconds before executing (default to 5), if you're sure about the operation then just set it to 0
   - `-v` = verbose
   - `-h` = show help

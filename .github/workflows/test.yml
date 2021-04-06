@@ -24,6 +24,7 @@ jobs:
 
           echo "installing with one-line curl"
           /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Kristian-Tan/git-worktree-create/HEAD/get)"
+          git-worktree-create -h
 
           cd "$initial_directory_path"
           echo "uninstalling from /bin (default location if not set)"
@@ -121,22 +122,22 @@ jobs:
           git status
           git worktree list
 
-          echo "test case 4: make worktree with relative path"
-          cd /tmp/mytest/repo1
-          git-worktree-create -b repo1_branch4 -w 0 -v -a .
-          cd /tmp/mytest/repo1_branch4
-          echo "`cat /tmp/mytest/repo1_branch4/.git`"
-          if test "`cat /tmp/mytest/repo1_branch4/.git`" != "gitdir: ../repo1/.git/worktrees/repo1_branch4"; then
-            echo "failed asserting git file"
-            exit 210
-          fi
-          echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4/gitdir`"
-          if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4/gitdir`" != "../repo1_branch4/.git"; then
-            echo "failed asserting git worktrees gitdir file"
-            exit 211
-          fi
-          git status
-          git worktree list
+          # echo "test case 4: make worktree with relative path"
+          # cd /tmp/mytest/repo1
+          # git-worktree-create -b repo1_branch4 -w 0 -v -a .
+          # cd /tmp/mytest/repo1_branch4
+          # echo "`cat /tmp/mytest/repo1_branch4/.git`"
+          # if test "`cat /tmp/mytest/repo1_branch4/.git`" != "gitdir: ../repo1/.git/worktrees/repo1_branch4"; then
+          #   echo "failed asserting git file"
+          #   exit 210
+          # fi
+          # echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4/gitdir`"
+          # if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4/gitdir`" != "../repo1_branch4/.git"; then
+          #   echo "failed asserting git worktrees gitdir file"
+          #   exit 211
+          # fi
+          # git status
+          # git worktree list
 
 
           echo "test case 1 with complete argument (absolute path)"
@@ -213,22 +214,22 @@ jobs:
           git status
           git worktree list
 
-          echo "test case 4 with complete argument (absolute path): make worktree with relative path"
-          cd ~
-          git-worktree-create -b repo1_branch4c -w 0 -v -a /tmp/mytest -d /tmp/mytest/repo1_branch4c -r /tmp/mytest/repo1
-          cd /tmp/mytest/repo1_branch4c
-          echo "`cat /tmp/mytest/repo1_branch4c/.git`"
-          if test "`cat /tmp/mytest/repo1_branch4c/.git`" != "gitdir: ../repo1/.git/worktrees/repo1_branch4c"; then
-            echo "failed asserting git file"
-            exit 221
-          fi
-          echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4c/gitdir`"
-          if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4c/gitdir`" != "../repo1_branch4c/.git"; then
-            echo "failed asserting git worktrees gitdir file"
-            exit 222
-          fi
-          git status
-          git worktree list
+          # echo "test case 4 with complete argument (absolute path): make worktree with relative path"
+          # cd ~
+          # git-worktree-create -b repo1_branch4c -w 0 -v -a /tmp/mytest -d /tmp/mytest/repo1_branch4c -r /tmp/mytest/repo1
+          # cd /tmp/mytest/repo1_branch4c
+          # echo "`cat /tmp/mytest/repo1_branch4c/.git`"
+          # if test "`cat /tmp/mytest/repo1_branch4c/.git`" != "gitdir: ../repo1/.git/worktrees/repo1_branch4c"; then
+          #   echo "failed asserting git file"
+          #   exit 221
+          # fi
+          # echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4c/gitdir`"
+          # if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4c/gitdir`" != "../repo1_branch4c/.git"; then
+          #   echo "failed asserting git worktrees gitdir file"
+          #   exit 222
+          # fi
+          # git status
+          # git worktree list
 
 
 
@@ -307,22 +308,22 @@ jobs:
           git status
           git worktree list
 
-          echo "test case 4 with complete argument (relative path): make worktree with relative path"
-          cd /tmp/mytest
-          git-worktree-create -v -b repo1_branch4r -w 0 -d repo1_branch4r -r repo1 -a .
-          cd /tmp/mytest/repo1_branch4r
-          echo "`cat /tmp/mytest/repo1_branch4r/.git`"
-          if test "`cat /tmp/mytest/repo1_branch4r/.git`" != "gitdir: ../repo1/.git/worktrees/repo1_branch4r"; then
-            echo "failed asserting git file"
-            exit 232
-          fi
-          echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4r/gitdir`"
-          if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4r/gitdir`" != "../repo1_branch4r/.git"; then
-            echo "failed asserting git worktrees gitdir file"
-            exit 233
-          fi
-          git status
-          git worktree list
+          # echo "test case 4 with complete argument (relative path): make worktree with relative path"
+          # cd /tmp/mytest
+          # git-worktree-create -v -b repo1_branch4r -w 0 -d repo1_branch4r -r repo1 -a .
+          # cd /tmp/mytest/repo1_branch4r
+          # echo "`cat /tmp/mytest/repo1_branch4r/.git`"
+          # if test "`cat /tmp/mytest/repo1_branch4r/.git`" != "gitdir: ../repo1/.git/worktrees/repo1_branch4r"; then
+          #   echo "failed asserting git file"
+          #   exit 232
+          # fi
+          # echo "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4r/gitdir`"
+          # if test "`cat /tmp/mytest/repo1/.git/worktrees/repo1_branch4r/gitdir`" != "../repo1_branch4r/.git"; then
+          #   echo "failed asserting git worktrees gitdir file"
+          #   exit 233
+          # fi
+          # git status
+          # git worktree list
 
 
           cd "$initial_directory_path"
