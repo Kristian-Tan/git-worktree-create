@@ -64,10 +64,10 @@ done
 #   Input string that should be printed if verbose is on
 verbose_output()
 {
-  if test $verbose -eq 1; then
-    #{ printf '>>> %s ' "$@"; echo; } 1>&2
+    #if test $verbose -eq 1; then
+    #    { printf '>>> %s ' "$@"; echo; } 1>&2
+    #fi
     echo $1
-  fi
 }
 
 # fill argument with default value
@@ -105,10 +105,12 @@ verbose_output "force_flag: '$force_flag'"
 verbose_output "linked_files: '${linked_files[@]}'"
 verbose_output "anchor_relative: '$anchor_relative'"
 verbose_output "wait_seconds: '$wait_seconds'"
+verbose_output "verbose: '$verbose'"
 
 echo ">>> executing in $wait_seconds seconds... (press ctrl+c to abort)"
 sleep $wait_seconds
 echo ">>> executing..."
+exit
 
 verbose_output "set directory target to absolute path"
 verbose_output "  \$ directory_target=`readlink -f $directory_target`"

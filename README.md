@@ -46,6 +46,7 @@
   - `-a anchor_relative` = make the created worktree linked by relative path instead of absolute one, option anchor_relative must be set to a directory name to be used in anchoring them (if not set, default absolute path worktree will be used)
   - `-w wait_seconds` = waiting for ... seconds before executing (default to 5), if you're sure about the operation then just set it to 0
   - `-v` = verbose
+  - `-h` = show help
 - example 1: -b branch_kristian -d /var/www/project1_kristian -r /var/www/project1 -f -l vendor -l node_modules -w 0 -v
   - (-b) use/create branch 'branch_kristian',
   - (-d) checkout in directory '/var/www/project1_kristian',
