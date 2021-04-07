@@ -1,4 +1,4 @@
 git clone --depth 1 https://github.com/Kristian-Tan/git-worktree-create.git
 cd git-worktree-create
-sudo bash install.sh
+sudo bash uninstall.sh
 rm -rf ../git-worktree-create
