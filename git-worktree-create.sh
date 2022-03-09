@@ -165,13 +165,13 @@ else
 fi
 
 verbose_output "deleting linked files"
-for val in "${linked_files[@]}"; do
+for val in ${linked_files[@]+"${linked_files[@]}"}; do
   verbose_output "  \$ rm -rf \"$directory_target/$val\""
   rm -rf "$directory_target/$val"
 done
 
 verbose_output "linking files"
-for val in "${linked_files[@]}"; do
+for val in ${linked_files[@]+"${linked_files[@]}"}; do
   verbose_output "  getting relative path"
   path_relative=`realpath --relative-to="$directory_target" "$val"`
   verbose_output "  \$ ln -s \"$path_relative\" \"$directory_target/$val\""
